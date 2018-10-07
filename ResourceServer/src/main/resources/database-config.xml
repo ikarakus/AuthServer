@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:cxf="http://cxf.apache.org/core" xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation=" http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-4.2.xsd 
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context-4.2.xsd
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+
+ 	<bean id="initializer" class="com.revoframework.service.Initializer" init-method="init"></bean> 
+
+	<bean id="myDataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="oracle.jdbc.OracleDriver" />
+		<!-- <property name="url" value="jdbc:oracle:thin:@192.168.30.2:1521/XE" 
+			/> <property name="username" value="#{systemEnvironment['DB_USER']}" /> <property 
+			name="password" value="#{systemEnvironment['DB_PASSWORD']}" /> -->
+		<property name="url" value="jdbc:oracle:thin:@192.168.0.190:1521/orcl" />
+		<!-- <property name="url" value="jdbc:oracle:thin:@dev.demo.eu:1521/XE" 
+			/> -->
+		<property name="username" value="PMX" />
+		<property name="password" value="PMX" />
+	</bean>
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+		<property name="sessionFactory" ref="mySessionFactory" />
+	</bean>
+	<bean id="mySessionFactory"
+		class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<property name="dataSource" ref="myDataSource" />
+ 		<property name="packagesToScan">
+			<list>
+				<value>com.revoframework.domain.common</value>
+				<value>com.demo.common.domain</value>
+				<value>com.demo.rest.entity</value>
+			</list>
+		</property> 
+		
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.jdbc.batch_size">50</prop>
+				<prop key="hibernate.enable_lazy_load_no_trans">true</prop>
+				<prop key="hibernate.discriminator.ignore_explicit_for_joined">false</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+</beans>
